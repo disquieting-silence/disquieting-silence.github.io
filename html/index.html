@@ -2,8 +2,95 @@
 <html>
 <head>
   <title>Sapling</title>
+  <script src="../node_modules/seedrandom/seedrandom.js"></script>
+  <script src="../node_modules/shuffle-seed/shuffle-seed.js"></script>
+
+  <style>
+     body * {
+       font-family: arial;
+     }
+
+    .banner {
+      font-size: 24px;
+    }
+
+    input {
+      font-size: 20px;
+      text-align: right;
+    }
+
+    .banner {
+      background: #cadbee;
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
+<div class="banner">
+  This is a work in progress. Nothing is polished. Everything is fragile.
+</div>
+  <p>Shuffling is provided by the node packages `shuffle-seed` and `seedrandom`</p>
+
+<h3 class="seed-heading">Seed: <span></span></h3>
+
+<h4 class="seed-verification">Verification <span>...</span></h4>
+
+<hr />
+<p>&nbsp;</p>
+
+<label for="card-number">Card number</label>
+<input type="number" id="card-number" min=1 max=48 value="1" />
+<button class="show-card-button">Show card</button>
+<script>
+
+const queryParameters = new URLSearchParams(window.location.search);
+const seedParam = queryParameters.get('seed');
+
+document.querySelector('.seed-heading span').innerHTML = seedParam;
+
+(() => {
+  const seedBits = seedParam.split('');
+  const shuffledSeed = shuffleSeed.shuffle(seedBits, seedParam);
+  document.querySelector('.seed-verification span').innerHTML = shuffledSeed.join('');
+})();
+
+document.querySelector('.show-card-button').addEventListener('click', () => {
+  const num = document.querySelector('#card-number').value;
+  const answer = prompt(`Are you sure you want to reveal card number: ${num}? Type ${num} again to confirm`);
+
+  if (answer !== num) {
+    alert('Incorrect validation. Cancelling request.');
+  } else {
+    alert('Card code: ' + doubleSorted[num]);
+  }
+})
+
+// Extremely hacky.
+const cards = [ ];
+for (var i = 1; i <= 4; i++) {
+  for (var j = 1; j <= 4; j++) {
+    // Do not choose a card already taken.
+    if (i === j) continue;
+    for (var k = 1; k <= 4; k++) {
+      // Do not choose a card already taken.
+      if (k === j || k === i) continue;
+
+      cards.push(`${i}, ${j}, ${k}`);
+    }
+  }
+}
+
+console.log('cards', cards);
+
+const doubled = cards.concat(cards);
+
+const sorted = shuffleSeed.shuffle(doubled, seedParam);
+const doubleSorted = shuffleSeed.shuffle(sorted, seedParam);
+
+console.log('sorted', doubleSorted);
+
+
+</script>
 
 
 </body>
